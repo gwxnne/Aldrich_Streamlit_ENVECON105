@@ -32,13 +32,13 @@
 
 # ### Import
 
-# In[61]:
+# In[11]:
 
 
 # pip install streamlit -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 
-# In[62]:
+# In[12]:
 
 
 import pandas as pd
@@ -48,22 +48,29 @@ import seaborn as sns
 import streamlit as st
 
 
-# In[63]:
+# In[13]:
 
 
-CO2 = pd.read_csv("co2_pcap_cons.csv")
-population = pd.read_csv("pop.csv")
-disasters = pd.read_excel("public_emdat_custom_request_2025-08-16_a5922965-bb80-478a-984f-461f64560ac9.xlsx")
-gdp = pd.read_csv("API_NY.GDP.PCAP.KD.ZG_DS2_en_csv_v2_37698.csv", skiprows=4)
-energy_use = pd.read_csv("API_EG.USE.PCAP.KG.OE_DS2_en_csv_v2_22839.csv", skiprows=4)
-temp = pd.read_excel("cmip6-x0.25_timeseries_tas_timeseries_annual_1950-2014,2015-2100_median,p10,p90_historical,ssp119,ssp126,ssp245,ssp370,ssp585_ensemble_all_mean.xlsx")
+# CO2 = pd.read_csv("co2_pcap_cons.csv")
+# population = pd.read_csv("pop.csv")
+# disasters = pd.read_excel("public_emdat_custom_request_2025-08-16_a5922965-bb80-478a-984f-461f64560ac9.xlsx")
+# gdp = pd.read_csv("API_NY.GDP.PCAP.KD.ZG_DS2_en_csv_v2_37698.csv", skiprows=4)
+# energy_use = pd.read_csv("API_EG.USE.PCAP.KG.OE_DS2_en_csv_v2_22839.csv", skiprows=4)
+# temp = pd.read_excel("cmip6-x0.25_timeseries_tas_timeseries_annual_1950-2014,2015-2100_median,p10,p90_historical,ssp119,ssp126,ssp245,ssp370,ssp585_ensemble_all_mean.xlsx")
+
+CO2 = pd.read_csv("https://raw.githubusercontent.com/gwxnne/Aldrich_Streamlit_ENVECON105/main/co2_pcap_cons.csv")
+disasters = pd.read_excel("https://raw.githubusercontent.com/gwxnne/Aldrich_Streamlit_ENVECON105/main/public_emdat_custom_request_2025-08-16_a5922965-bb80-478a-984f-461f64560ac9.xlsx")
+gdp = pd.read_csv("https://raw.githubusercontent.com/gwxnne/Aldrich_Streamlit_ENVECON105/main/API_NY.GDP.PCAP.KD.ZG_DS2_en_csv_v2_37698.csv", skiprows=4)
+energy_use = pd.read_csv("https://raw.githubusercontent.com/gwxnne/Aldrich_Streamlit_ENVECON105/main/API_EG.USE.PCAP.KG.OE_DS2_en_csv_v2_22839.csv", skiprows=4)
+temp = pd.read_excel("https://raw.githubusercontent.com/gwxnne/Aldrich_Streamlit_ENVECON105/main/cmip6-x0.25_timeseries_tas_timeseries_annual_1950-2014,2015-2100_median,p10,p90_historical,ssp119,ssp126,ssp245,ssp370,ssp585_ensemble_all_mean.xlsx")
+
 
 
 # ### Data Wrangling
 
 # First, let's take a look at the star of the show, CO2 emissions:
 
-# In[64]:
+# In[14]:
 
 
 CO2.head(n=5)
@@ -71,7 +78,7 @@ CO2.head(n=5)
 
 # Something looks a little off with the data, 21.100 Tonnes of CO2 isn't a realistic output for a country, especiallt the UAE. The current data we're working with is emissions per capita. We can multiply the per capita outputs times population to get a country's total output 
 
-# In[65]:
+# In[15]:
 
 
 def parse_number(x):
@@ -88,7 +95,7 @@ def parse_number(x):
         return float(x)
 
 
-# In[66]:
+# In[16]:
 
 
 pop_melt = pd.melt(
@@ -103,7 +110,7 @@ pop_melt.head()
 
 # As we can see, our current data set deals with data from all countries around the world. The format for this data isn't ideal for what we want to do. We can use the pandas function melt to turn each row into an individual entry for a country per year. We'll also perform some basic data cleaning.
 
-# In[67]:
+# In[17]:
 
 
 CO2melt = pd.melt(
@@ -121,7 +128,7 @@ CO2melt.head()
 
 # There are some small issues that occured when importing the csv. The negative in front of this value is under a different code, so pandas is unable to convert the string into an integer. In the following cell, I will adjust some of these discrepencies
 
-# In[68]:
+# In[18]:
 
 
 problem_indices = [39517,39711,39905,40099,41069,41263,41457]
@@ -142,19 +149,19 @@ CO2melt.head()
 
 # With CO2 emissions down, let's take a look at gdp data. The GDP data is similar to the CO2 emissions data in the sense that columns are individual years and rows are individual countries. For the purposes of this project, it'd be easiest to melt the data
 
-# In[69]:
+# In[19]:
 
 
 gdp.head(n=5)
 
 
-# In[70]:
+# In[20]:
 
 
 gdp.columns
 
 
-# In[71]:
+# In[21]:
 
 
 gdp_cleaned = gdp.drop(columns = ["Country Code", "Indicator Name", "Indicator Code", "Unnamed: 69"])
@@ -172,7 +179,7 @@ gdp_melt.sample(n=3)
 
 # Our CO2 and GDP growth tables look great, let's move forward with the energy use table. We're going to use a similar process with this table as we did with the others. Let's first observe it and melt it
 
-# In[72]:
+# In[22]:
 
 
 energy_use_cleaned = energy_use.drop(columns = ["Country Code", "Indicator Name", "Indicator Code", "Unnamed: 69"])
@@ -188,7 +195,7 @@ energy_use_melt.sample(n=3)
 
 # Let's take a look at disasters
 
-# In[73]:
+# In[23]:
 
 
 np.unique(disasters["Disaster Type"])
@@ -196,14 +203,14 @@ np.unique(disasters["Disaster Type"])
 
 # As we can see here, there is a wide variety of disasters we could work with. I think a particularly interesting disaster to explore would be storms, given the Philippines' status as a tropical and typhoon prone country.
 
-# In[74]:
+# In[24]:
 
 
 disasters_storms = disasters[disasters["Disaster Type"] == "Storm"]
 disasters_storms.head(n=3)
 
 
-# In[75]:
+# In[25]:
 
 
 storm_count = disasters_storms[["Start Year", "DisNo."]]
@@ -215,7 +222,7 @@ storm_count.sample(n=3)
 
 # Let's now take a look at our final dataframe temperature.
 
-# In[76]:
+# In[26]:
 
 
 temp
@@ -223,7 +230,7 @@ temp
 
 # Only one row, makes this a bit easier to work with. Our first step will be to clean up the years. Lets just take the first four values in the dates to extract the year. From there, we can melt!
 
-# In[77]:
+# In[27]:
 
 
 temp_clean = temp.drop(columns = ["code"])
@@ -242,7 +249,7 @@ temp_melt.sample(n=3)
 
 # ### Extracting Data from the Philippines and Joining
 
-# In[78]:
+# In[28]:
 
 
 PH_CO2 = CO2melt[CO2melt["Country"] == "Philippines"]
@@ -251,7 +258,7 @@ PH_energy_use = energy_use_melt[energy_use_melt["Country"] == "Philippines"]
 #both the disaster and temperature dataset already exclusively contain data from the Pbilippines
 
 
-# In[79]:
+# In[29]:
 
 
 data_wide = (
@@ -264,7 +271,7 @@ data_wide.sample(n=3)
 
 # Let's melt this combined dataset
 
-# In[80]:
+# In[30]:
 
 
 data_long = data_wide.melt(
@@ -277,7 +284,7 @@ data_long.sample(n=3)
 
 # We can seperate this data into the Philippines and rest of the World. Let's also remove na values while we're at it
 
-# In[81]:
+# In[31]:
 
 
 data_long["Region"] = np.where(
@@ -298,14 +305,14 @@ data_long = (
 
 # Let's take a look at global emissions per capita. The following table (data_long_gf) will sum up the emissions from all countries per year. We can then observe these values on a graph to see how emissions have changed over time
 
-# In[82]:
+# In[32]:
 
 
 data_long_gf = data_long[data_long["Indicator"]=="Emissions"].groupby("Year")["Value"].sum().reset_index()
 data_long_gf.head(n=3)
 
 
-# In[83]:
+# In[33]:
 
 
 plt.plot(data_long_gf["Year"], data_long_gf["Value"], linewidth=1.5)
@@ -316,7 +323,7 @@ plt.title(r"World $CO{2}$ Emissions per capita per Year (1800-2022)")
 
 # Let's now compare the emissions of all countries, with a special emphasis on the Philippines
 
-# In[84]:
+# In[34]:
 
 
 data_long_emissions = data_long[data_long["Indicator"]=="Emissions"]
@@ -344,7 +351,7 @@ st.pyplot(fig)
 
 
 
-# In[85]:
+# In[35]:
 
 
 top_10_count = data_long[(data_long["Indicator"] == "Emissions") & (data_long["Year"] == 2014)]
@@ -352,7 +359,7 @@ top_10_count = top_10_count.sort_values("Value", ascending = False)[:10]
 top_10_count
 
 
-# In[86]:
+# In[36]:
 
 
 fig, ax = plt.subplots()
@@ -378,7 +385,7 @@ st.pyplot(fig)
 
 # Let's graph these country's emissions per capita as well. 
 
-# In[87]:
+# In[37]:
 
 
 top_10_countries = top_10_count["Country"]
@@ -400,7 +407,7 @@ sns.heatmap(
 plt.title("Top 10 CO2 Emission-producing Countries")
 
 
-# In[88]:
+# In[38]:
 
 
 facetdata = data_long[~data_long["Indicator"].isin(["Disasters", "Temperature"])]
@@ -408,7 +415,7 @@ grid = sns.FacetGrid(facetdata, row ="Indicator", col="Region", sharey = False, 
 grid.map_dataframe(sns.lineplot, x="Year", y="Value", hue="Country", legend=False)
 
 
-# In[89]:
+# In[39]:
 
 
 CO2_temp_PH_facet = data_long[data_long["Country"] == "Philippines"]
@@ -425,7 +432,7 @@ grid.map_dataframe(sns.regplot, x="Year", y="Value", lowess = True, scatter=True
 
 # We can expect there to be some parallels between temperature and emissions, let's explore that possibility here! Let's first find the average temperature and co2 emissions in addition to their standard deviations
 
-# In[90]:
+# In[40]:
 
 
 wide_PH = data_long[data_long["Country"] == "Philippines"]
@@ -434,7 +441,7 @@ wide_PH = wide_PH[wide_PH["Year"] <= 2014]
 wide_PH = wide_PH.drop(columns=["Label"]).pivot(index=["Year","Country"],columns="Indicator",values="Value").reset_index()
 
 
-# In[91]:
+# In[41]:
 
 
 CO2_mean = np.mean(wide_PH["Emissions"])
@@ -449,21 +456,21 @@ print("The std for temperature in the Philippines is " + str(temp_std))
 
 # Let's now take a look at how they correlate with one another. The result here is interestingly enough different than the United States' correlation in the way that it is negative. As the average temperature increases, the emissions decrease.
 
-# In[92]:
+# In[42]:
 
 
 CO2_temp_corr = wide_PH["Emissions"].corr(temp_melt["Mean Temperature"])
 CO2_temp_corr
 
 
-# In[93]:
+# In[43]:
 
 
 def scale(data):
     return (data-np.mean(data))/np.std(data)
 
 
-# In[94]:
+# In[44]:
 
 
 wide_PH["Emissions_scaled"] = scale(wide_PH["Emissions"])
