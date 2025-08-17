@@ -32,13 +32,13 @@
 
 # ### Import
 
-# In[11]:
+# In[1]:
 
 
 # pip install streamlit -i https://pypi.tuna.tsinghua.edu.cn/simple
 
 
-# In[12]:
+# In[2]:
 
 
 import pandas as pd
@@ -48,7 +48,7 @@ import seaborn as sns
 import streamlit as st
 
 
-# In[45]:
+# In[3]:
 
 
 CO2 = pd.read_csv("https://raw.githubusercontent.com/gwxnne/Aldrich_Streamlit_ENVECON105/main/co2_pcap_cons.csv")
@@ -63,7 +63,7 @@ temp = pd.read_excel("https://raw.githubusercontent.com/gwxnne/Aldrich_Streamlit
 
 # First, let's take a look at the star of the show, CO2 emissions:
 
-# In[14]:
+# In[4]:
 
 
 CO2.head(n=5)
@@ -71,7 +71,7 @@ CO2.head(n=5)
 
 # Something looks a little off with the data, 21.100 Tonnes of CO2 isn't a realistic output for a country, especiallt the UAE. The current data we're working with is emissions per capita. We can multiply the per capita outputs times population to get a country's total output 
 
-# In[15]:
+# In[5]:
 
 
 def parse_number(x):
@@ -90,7 +90,7 @@ def parse_number(x):
 
 # As we can see, our current data set deals with data from all countries around the world. The format for this data isn't ideal for what we want to do. We can use the pandas function melt to turn each row into an individual entry for a country per year. We'll also perform some basic data cleaning.
 
-# In[17]:
+# In[6]:
 
 
 CO2melt = pd.melt(
@@ -107,7 +107,7 @@ CO2melt.head()
 
 # There are some small issues that occured when importing the csv. The negative in front of this value is under a different code, so pandas is unable to convert the string into an integer. In the following cell, I will adjust some of these discrepencies
 
-# In[18]:
+# In[7]:
 
 
 problem_indices = [39517,39711,39905,40099,41069,41263,41457]
@@ -121,24 +121,25 @@ for idx in problem_indices:
 # CO2melt["Emissions"][41263] = '-' + CO2melt["Emissions"][41263][1:6]
 # CO2melt["Emissions"][41457] = '-' + CO2melt["Emissions"][41457][1:6]
 
-CO2melt["Emissions"] = pd.to_numeric(CO2melt["Emissions"])CO2melt.head()
+CO2melt["Emissions"] = pd.to_numeric(CO2melt["Emissions"])
+CO2melt.head()
 
 
 # With CO2 emissions down, let's take a look at gdp data. The GDP data is similar to the CO2 emissions data in the sense that columns are individual years and rows are individual countries. For the purposes of this project, it'd be easiest to melt the data
 
-# In[19]:
+# In[8]:
 
 
 gdp.head(n=5)
 
 
-# In[20]:
+# In[9]:
 
 
 gdp.columns
 
 
-# In[21]:
+# In[10]:
 
 
 gdp_cleaned = gdp.drop(columns = ["Country Code", "Indicator Name", "Indicator Code", "Unnamed: 69"])
@@ -156,7 +157,7 @@ gdp_melt.sample(n=3)
 
 # Our CO2 and GDP growth tables look great, let's move forward with the energy use table. We're going to use a similar process with this table as we did with the others. Let's first observe it and melt it
 
-# In[22]:
+# In[11]:
 
 
 energy_use_cleaned = energy_use.drop(columns = ["Country Code", "Indicator Name", "Indicator Code", "Unnamed: 69"])
@@ -172,7 +173,7 @@ energy_use_melt.sample(n=3)
 
 # Let's take a look at disasters
 
-# In[23]:
+# In[12]:
 
 
 np.unique(disasters["Disaster Type"])
@@ -180,14 +181,14 @@ np.unique(disasters["Disaster Type"])
 
 # As we can see here, there is a wide variety of disasters we could work with. I think a particularly interesting disaster to explore would be storms, given the Philippines' status as a tropical and typhoon prone country.
 
-# In[24]:
+# In[13]:
 
 
 disasters_storms = disasters[disasters["Disaster Type"] == "Storm"]
 disasters_storms.head(n=3)
 
 
-# In[25]:
+# In[14]:
 
 
 storm_count = disasters_storms[["Start Year", "DisNo."]]
@@ -199,7 +200,7 @@ storm_count.sample(n=3)
 
 # Let's now take a look at our final dataframe temperature.
 
-# In[26]:
+# In[15]:
 
 
 temp
@@ -207,7 +208,7 @@ temp
 
 # Only one row, makes this a bit easier to work with. Our first step will be to clean up the years. Lets just take the first four values in the dates to extract the year. From there, we can melt!
 
-# In[27]:
+# In[16]:
 
 
 temp_clean = temp.drop(columns = ["code"])
@@ -226,7 +227,7 @@ temp_melt.sample(n=3)
 
 # ### Extracting Data from the Philippines and Joining
 
-# In[28]:
+# In[17]:
 
 
 PH_CO2 = CO2melt[CO2melt["Country"] == "Philippines"]
@@ -235,7 +236,7 @@ PH_energy_use = energy_use_melt[energy_use_melt["Country"] == "Philippines"]
 #both the disaster and temperature dataset already exclusively contain data from the Pbilippines
 
 
-# In[29]:
+# In[18]:
 
 
 data_wide = (
@@ -248,7 +249,7 @@ data_wide.sample(n=3)
 
 # Let's melt this combined dataset
 
-# In[30]:
+# In[19]:
 
 
 data_long = data_wide.melt(
@@ -261,7 +262,7 @@ data_long.sample(n=3)
 
 # We can seperate this data into the Philippines and rest of the World. Let's also remove na values while we're at it
 
-# In[31]:
+# In[20]:
 
 
 data_long["Region"] = np.where(
@@ -282,14 +283,14 @@ data_long = (
 
 # Let's take a look at global emissions per capita. The following table (data_long_gf) will sum up the emissions from all countries per year. We can then observe these values on a graph to see how emissions have changed over time
 
-# In[32]:
+# In[21]:
 
 
 data_long_gf = data_long[data_long["Indicator"]=="Emissions"].groupby("Year")["Value"].sum().reset_index()
 data_long_gf.head(n=3)
 
 
-# In[33]:
+# In[22]:
 
 
 plt.plot(data_long_gf["Year"], data_long_gf["Value"], linewidth=1.5)
@@ -300,7 +301,7 @@ plt.title(r"World $CO{2}$ Emissions per capita per Year (1800-2022)")
 
 # Let's now compare the emissions of all countries, with a special emphasis on the Philippines
 
-# In[34]:
+# In[23]:
 
 
 data_long_emissions = data_long[data_long["Indicator"]=="Emissions"]
@@ -328,7 +329,7 @@ st.pyplot(fig)
 
 
 
-# In[35]:
+# In[24]:
 
 
 top_10_count = data_long[(data_long["Indicator"] == "Emissions") & (data_long["Year"] == 2014)]
@@ -336,7 +337,7 @@ top_10_count = top_10_count.sort_values("Value", ascending = False)[:10]
 top_10_count
 
 
-# In[36]:
+# In[25]:
 
 
 fig, ax = plt.subplots()
@@ -362,7 +363,7 @@ st.pyplot(fig)
 
 # Let's graph these country's emissions per capita as well. 
 
-# In[37]:
+# In[26]:
 
 
 top_10_countries = top_10_count["Country"]
@@ -384,7 +385,7 @@ sns.heatmap(
 plt.title("Top 10 CO2 Emission-producing Countries")
 
 
-# In[38]:
+# In[27]:
 
 
 facetdata = data_long[~data_long["Indicator"].isin(["Disasters", "Temperature"])]
@@ -392,7 +393,7 @@ grid = sns.FacetGrid(facetdata, row ="Indicator", col="Region", sharey = False, 
 grid.map_dataframe(sns.lineplot, x="Year", y="Value", hue="Country", legend=False)
 
 
-# In[39]:
+# In[28]:
 
 
 CO2_temp_PH_facet = data_long[data_long["Country"] == "Philippines"]
@@ -409,7 +410,7 @@ grid.map_dataframe(sns.regplot, x="Year", y="Value", lowess = True, scatter=True
 
 # We can expect there to be some parallels between temperature and emissions, let's explore that possibility here! Let's first find the average temperature and co2 emissions in addition to their standard deviations
 
-# In[40]:
+# In[29]:
 
 
 wide_PH = data_long[data_long["Country"] == "Philippines"]
@@ -418,7 +419,7 @@ wide_PH = wide_PH[wide_PH["Year"] <= 2014]
 wide_PH = wide_PH.drop(columns=["Label"]).pivot(index=["Year","Country"],columns="Indicator",values="Value").reset_index()
 
 
-# In[41]:
+# In[30]:
 
 
 CO2_mean = np.mean(wide_PH["Emissions"])
@@ -433,21 +434,21 @@ print("The std for temperature in the Philippines is " + str(temp_std))
 
 # Let's now take a look at how they correlate with one another. The result here is interestingly enough different than the United States' correlation in the way that it is negative. As the average temperature increases, the emissions decrease.
 
-# In[42]:
+# In[31]:
 
 
 CO2_temp_corr = wide_PH["Emissions"].corr(temp_melt["Mean Temperature"])
 CO2_temp_corr
 
 
-# In[43]:
+# In[32]:
 
 
 def scale(data):
     return (data-np.mean(data))/np.std(data)
 
 
-# In[44]:
+# In[33]:
 
 
 wide_PH["Emissions_scaled"] = scale(wide_PH["Emissions"])
@@ -461,13 +462,3 @@ st.pyplot(fig)
 
 
 # ### SUMMARY
-
-# In this case study, we took a look at a variety of measures to understand the impact of CO2 emissions in the Philippines and the potential reasons for why they are the way they are now. CO2 emissions per capita have invariably increased over time, but so does every other metric (except temperature). We explored the possibility for some correlation between disasters, temperature, energy use, and GDP to emissions.
-# 
-# Although it is now common scientific knowledge that the proliferation of greenhouse gasses has effects such as increased global temperatures. However, these events are no exclusive to the Philippines and it would be disingenuous to assert that production and movement in the Philippines is the sole factor that contributes to changes in their emissions. Climate change is a global movement and the actions of one player has effects on everyone. There are also many contextual details that make patterns difficult to draw. Earlier in this project we saw that temperature and emissions had a NEGATIVE correlation, much to the dissent of original proposed thought. When we consider the tropical and year-round hot weather in the Philippines though, it gives some reason that the negative correlation came about. There is still a lot more data to unpack and unravel to make definitive assertions on the factors that influence emissions in the Phhilippines
-
-# In[ ]:
-
-
-
-
