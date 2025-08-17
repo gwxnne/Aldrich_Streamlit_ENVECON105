@@ -133,12 +133,6 @@ CO2melt.head()
 gdp.head(n=5)
 
 
-# In[9]:
-
-
-gdp.columns
-
-
 # In[10]:
 
 
@@ -199,12 +193,6 @@ storm_count.sample(n=3)
 
 
 # Let's now take a look at our final dataframe temperature.
-
-# In[15]:
-
-
-temp
-
 
 # Only one row, makes this a bit easier to work with. Our first step will be to clean up the years. Lets just take the first four values in the dates to extract the year. From there, we can melt!
 
@@ -337,7 +325,7 @@ top_10_count = top_10_count.sort_values("Value", ascending = False)[:10]
 top_10_count
 
 
-# In[25]:
+# In[37]:
 
 
 fig, ax = plt.subplots()
@@ -359,11 +347,12 @@ plt.suptitle("x")
 ax.set_xlabel("Year")
 ax.set_ylabel("Emissions (Metric Tons)")
 st.pyplot(fig)
+plt.show()
 
 
 # Let's graph these country's emissions per capita as well. 
 
-# In[26]:
+# In[38]:
 
 
 top_10_countries = top_10_count["Country"]
@@ -383,17 +372,19 @@ sns.heatmap(
 )
 
 plt.title("Top 10 CO2 Emission-producing Countries")
+plt.show()
 
 
-# In[27]:
+# In[39]:
 
 
 facetdata = data_long[~data_long["Indicator"].isin(["Disasters", "Temperature"])]
 grid = sns.FacetGrid(facetdata, row ="Indicator", col="Region", sharey = False, aspect=1.5)
 grid.map_dataframe(sns.lineplot, x="Year", y="Value", hue="Country", legend=False)
+plt.show()
 
 
-# In[28]:
+# In[40]:
 
 
 CO2_temp_PH_facet = data_long[data_long["Country"] == "Philippines"]
@@ -404,6 +395,8 @@ CO2_temp_PH_facet = CO2_temp_PH_facet[CO2_temp_PH_facet["Indicator"].isin(["Emis
 
 grid = sns.FacetGrid(CO2_temp_PH_facet,row="Label", sharey=False, aspect=1.5)
 grid.map_dataframe(sns.regplot, x="Year", y="Value", lowess = True, scatter=True)
+
+plt.show()
 
 
 # ### DATA ANALYSIS
@@ -448,7 +441,7 @@ def scale(data):
     return (data-np.mean(data))/np.std(data)
 
 
-# In[33]:
+# In[41]:
 
 
 wide_PH["Emissions_scaled"] = scale(wide_PH["Emissions"])
@@ -459,6 +452,17 @@ ax.set_title("C02 Emissions and Temperature (1980-2014)")
 ax.set_xlabel("Scaled Emission (Metric Tonnes)")
 ax.set_ylabel("Scaled Temperature (Fahrenheit)")
 st.pyplot(fig)
+plt.show()
 
 
 # ### SUMMARY
+
+# In this case study, we took a look at a variety of measures to understand the impact of CO2 emissions in the Philippines and the potential reasons for why they are the way they are now. CO2 emissions per capita have invariably increased over time, but so does every other metric (except temperature). We explored the possibility for some correlation between disasters, temperature, energy use, and GDP to emissions.
+# 
+# Although it is now common scientific knowledge that the proliferation of greenhouse gasses has effects such as increased global temperatures. However, these events are no exclusive to the Philippines and it would be disingenuous to assert that production and movement in the Philippines is the sole factor that contributes to changes in their emissions. Climate change is a global movement and the actions of one player has effects on everyone. There are also many contextual details that make patterns difficult to draw. Earlier in this project we saw that temperature and emissions had a NEGATIVE correlation, much to the dissent of original proposed thought. When we consider the tropical and year-round hot weather in the Philippines though, it gives some reason that the negative correlation came about (if at all given the random nature of the plot). There is still a lot more data to unpack and unravel to make definitive assertions on the factors that influence emissions in the Philippines.
+
+# In[ ]:
+
+
+
+
