@@ -48,15 +48,8 @@ import seaborn as sns
 import streamlit as st
 
 
-# In[13]:
+# In[45]:
 
-
-# CO2 = pd.read_csv("co2_pcap_cons.csv")
-# population = pd.read_csv("pop.csv")
-# disasters = pd.read_excel("public_emdat_custom_request_2025-08-16_a5922965-bb80-478a-984f-461f64560ac9.xlsx")
-# gdp = pd.read_csv("API_NY.GDP.PCAP.KD.ZG_DS2_en_csv_v2_37698.csv", skiprows=4)
-# energy_use = pd.read_csv("API_EG.USE.PCAP.KG.OE_DS2_en_csv_v2_22839.csv", skiprows=4)
-# temp = pd.read_excel("cmip6-x0.25_timeseries_tas_timeseries_annual_1950-2014,2015-2100_median,p10,p90_historical,ssp119,ssp126,ssp245,ssp370,ssp585_ensemble_all_mean.xlsx")
 
 CO2 = pd.read_csv("https://raw.githubusercontent.com/gwxnne/Aldrich_Streamlit_ENVECON105/main/co2_pcap_cons.csv")
 disasters = pd.read_excel("https://raw.githubusercontent.com/gwxnne/Aldrich_Streamlit_ENVECON105/main/public_emdat_custom_request_2025-08-16_a5922965-bb80-478a-984f-461f64560ac9.xlsx")
@@ -95,19 +88,6 @@ def parse_number(x):
         return float(x)
 
 
-# In[16]:
-
-
-pop_melt = pd.melt(
-    population,
-    id_vars=["country"],
-    var_name="Year",         
-    value_name="Population"   
-)
-pop_melt["Population"] = [parse_number(x) for x in pop_melt["Population"]]
-pop_melt.head()
-
-
 # As we can see, our current data set deals with data from all countries around the world. The format for this data isn't ideal for what we want to do. We can use the pandas function melt to turn each row into an individual entry for a country per year. We'll also perform some basic data cleaning.
 
 # In[17]:
@@ -122,7 +102,6 @@ CO2melt = pd.melt(
 CO2melt = CO2melt.rename(columns = {"country":"Country"})
 CO2melt["Year"] = pd.to_numeric(CO2melt["Year"])
 CO2melt["Label"] = "CO2 Emissions (Metric Tons)"
-#CO2melt["Emissions"] = CO2melt["Emissions per Capita"] * pop_melt["Population"]
 CO2melt.head()
 
 
@@ -142,9 +121,7 @@ for idx in problem_indices:
 # CO2melt["Emissions"][41263] = '-' + CO2melt["Emissions"][41263][1:6]
 # CO2melt["Emissions"][41457] = '-' + CO2melt["Emissions"][41457][1:6]
 
-CO2melt["Emissions"] = pd.to_numeric(CO2melt["Emissions"])
-# CO2melt["Emissions"] = CO2melt["Emissions per Capita"] * pop_melt["Population"]
-CO2melt.head()
+CO2melt["Emissions"] = pd.to_numeric(CO2melt["Emissions"])CO2melt.head()
 
 
 # With CO2 emissions down, let's take a look at gdp data. The GDP data is similar to the CO2 emissions data in the sense that columns are individual years and rows are individual countries. For the purposes of this project, it'd be easiest to melt the data
